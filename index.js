@@ -6,7 +6,7 @@ const path = require('path');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers, // Required to detect role changes and manage them
+        GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ]
@@ -19,6 +19,13 @@ let activeBoosters = {};
 // ⚙️ SYSTEM CONFIGURATION
 const REQUIRED_ROLE_ID = "1538016060253413396"; 
 const BOOSTER_CHAT_CHANNEL_ID = "1538986835210936380"; 
+
+// 🎯 AUTO-DROP CONFIGURATION
+let activeMessageCount = 0;
+let lastDropTime = 0;
+let currentActiveDrop = null; 
+const MESSAGES_NEEDED_FOR_DROP = 15; 
+const DROP_COOLDOWN_MS = 1800000; 
 
 try {
     if (fs.existsSync(dataFilePath)) {
@@ -77,7 +84,6 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
     const hasRole = newMember.roles.cache.has(REQUIRED_ROLE_ID);
     const boosterChannel = newMember.guild.channels.cache.get(BOOSTER_CHAT_CHANNEL_ID);
 
-    // Case 1: Someone JUST got the booster role
     if (!hadRole && hasRole) {
         if (activeBoosters[newMember.id]) return;
 
@@ -99,7 +105,6 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
         }
     }
 
-    // Case 2: Someone's boost RAN OUT (Role removed)
     if (hadRole && !hasRole) {
         if (activeBoosters[newMember.id]) {
             delete activeBoosters[newMember.id];
@@ -116,9 +121,37 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
     const cleanContent = message.content.replace(/\s+/g, ' ').trim().toLowerCase();
-    
-    // Adjusted check to allow b-test and b1-test commands to pass through
-    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-') || cleanContent.startsWith('b1');
+
+    // 💰 INTERACTIVE DROP CLAIMING SYSTEM
+    if (currentActiveDrop && cleanContent === 'claim') {
+        const prize = currentActiveDrop.amount;
+        currentActiveDrop = null; 
+
+        try {
+            await unb.editUserBalance(message.guild.id, message.author.id, { cash: prize });
+            return message.reply(`🎉 **WINNER!** <@${message.author.id}> caught the pouch and won **250,000** cash in UnbelievaBoat!`);
+        } catch (err) {
+            console.error(err);
+            return message.reply('❌ Caught the pouch, but I failed to deposit the cash to UnbelievaBoat. Check my UNB_TOKEN!');
+        }
+    }
+
+    // 📈 CHAT ACTIVITY MONITOR (Automated Triggers)
+    const now = Date.now();
+    if (!currentActiveDrop && (now - lastDropTime >= DROP_COOLDOWN_MS)) {
+        activeMessageCount++;
+
+        if (activeMessageCount >= MESSAGES_NEEDED_FOR_DROP) {
+            activeMessageCount = 0; 
+            lastDropTime = now; 
+            currentActiveDrop = { amount: 250000 }; 
+
+            return message.channel.send('🎁💰 **ACTIVITY DROP EVENT!** 💰🎁\nChat is heating up! A bag containing **250,000 cash** has dropped from the sky!\n\n👉 Type **`CLAIM`** right now to snatch it!');
+        }
+    }
+
+    // Command verification check
+    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-') || cleanContent.startsWith('b1') || cleanContent.startsWith('drop');
     if (!isCommand) return; 
 
     // Command 1: !test
@@ -141,8 +174,28 @@ client.on('messageCreate', async (message) => {
         return message.reply(`📝 **Current Booster-1 List:**\n${listText}`);
     }
 
-    // Command 4: !booster-test Simulator (NEW COMMAND)
-    // Shortcuts: !booster-test, ! booster-test, !b-test, ! b-test, b-test, b1-test
+    // Command 4: !drop Manual Overrides
+    else if (
+        cleanContent === '!drop' ||
+        cleanContent === '! drop' ||
+        cleanContent === '!d' ||
+        cleanContent === '! d' ||
+        cleanContent === 'drop' ||
+        cleanContent === 'd'
+    ) {
+        if (!message.member.roles.cache.has(REQUIRED_ROLE_ID)) {
+            return message.reply('❌ You do not have permission to trigger a manual cash drop!');
+        }
+
+        if (currentActiveDrop) {
+            return message.reply('⚠️ An active cash drop event is already running in this server! Wait for it to be claimed first.');
+        }
+
+        currentActiveDrop = { amount: 250000 };
+        return message.channel.send('🎁💰 **MANUAL ADMIN DROP EVENT!** 💰🎁\nAn Administrator dropped a massive reward! A bag containing **250,000 cash** is floating in chat!\n\n👉 Type **`CLAIM`** right now to snatch it!');
+    }
+
+    // Command 5: !booster-test Simulator
     else if (
         cleanContent === '!booster-test' ||
         cleanContent === '! booster-test' ||
@@ -155,21 +208,19 @@ client.on('messageCreate', async (message) => {
         
         try {
             if (hasRole) {
-                // If you already have it, remove it to simulate an expired boost
                 await message.member.roles.remove(REQUIRED_ROLE_ID);
                 return message.reply('🧪 **Simulation:** Removed your booster role to test the expired boost sequence!');
             } else {
-                // If you don't have it, give it to simulate a brand new boost
                 await message.member.roles.add(REQUIRED_ROLE_ID);
                 return message.reply('🧪 **Simulation:** Granted you the booster role to test the new boost sequence!');
             }
         } catch (err) {
             console.error(err);
-            return message.reply('❌ Unable to change your roles. Please check that the MTH Bot role is moved **ABOVE** the booster role in your server settings hierarchy, otherwise Discord blocks the bot from granting it!');
+            return message.reply('❌ Unable to change your roles. Please check that the MTH Bot role is moved **ABOVE** the booster role in your server settings hierarchy!');
         }
     }
 
-    // Command 5: Manual Fallback Option
+    // Command 6: Manual Fallback Option
     else if (
         cleanContent.startsWith('!booster-1') || 
         cleanContent.startsWith('! booster-1') || 
@@ -212,4 +263,4 @@ client.on('messageCreate', async (message) => {
 client.on('error', console.error);
 
 client.login(process.env.DISCORD_TOKEN);
-    
+                
