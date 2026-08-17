@@ -6,6 +6,7 @@ const path = require('path');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers, // Required to detect role changes and manage them
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ]
@@ -14,6 +15,10 @@ const client = new Client({
 const unb = new UnbClient(process.env.UNB_TOKEN);
 const dataFilePath = path.join(__dirname, 'boosters.json');
 let activeBoosters = {};
+
+// ⚙️ SYSTEM CONFIGURATION
+const REQUIRED_ROLE_ID = "1538016060253413396"; 
+const BOOSTER_CHAT_CHANNEL_ID = "1538986835210936380"; 
 
 try {
     if (fs.existsSync(dataFilePath)) {
@@ -37,6 +42,7 @@ client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity('!test', { type: ActivityType.Listening });
 
+    // 24-Hour Automated Loop
     setInterval(async () => {
         const now = Date.now();
         let dataChanged = false;
@@ -65,48 +71,112 @@ client.once('ready', () => {
     }, 3600000); 
 });
 
+// 🤖 AUTOMATIC BOOSTER DETECTOR (Welcome & Goodbye Tracker)
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+    const hadRole = oldMember.roles.cache.has(REQUIRED_ROLE_ID);
+    const hasRole = newMember.roles.cache.has(REQUIRED_ROLE_ID);
+    const boosterChannel = newMember.guild.channels.cache.get(BOOSTER_CHAT_CHANNEL_ID);
+
+    // Case 1: Someone JUST got the booster role
+    if (!hadRole && hasRole) {
+        if (activeBoosters[newMember.id]) return;
+
+        activeBoosters[newMember.id] = {
+            guildId: newMember.guild.id,
+            channelId: BOOSTER_CHAT_CHANNEL_ID,
+            lastRun: Date.now()
+        };
+        saveBoostersData();
+
+        if (boosterChannel) {
+            boosterChannel.send(`Hey <@${newMember.id}>! Thank you for boosting. Here, have some UB!`);
+        }
+
+        try {
+            await unb.editUserBalance(newMember.guild.id, newMember.id, { cash: 50000 });
+        } catch (err) {
+            console.error(`Failed automatic initial UB payout for ${newMember.id}:`, err);
+        }
+    }
+
+    // Case 2: Someone's boost RAN OUT (Role removed)
+    if (hadRole && !hasRole) {
+        if (activeBoosters[newMember.id]) {
+            delete activeBoosters[newMember.id];
+            saveBoostersData();
+
+            if (boosterChannel) {
+                boosterChannel.send(`👋 Goodbye <@${newMember.id}>, your server boost has ended. Your daily UB benefits have been removed.`);
+            }
+        }
+    }
+});
+
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
     const cleanContent = message.content.replace(/\s+/g, ' ').trim().toLowerCase();
-
-    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-1') || cleanContent.startsWith('b1');
+    
+    // Adjusted check to allow b-test and b1-test commands to pass through
+    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-') || cleanContent.startsWith('b1');
     if (!isCommand) return; 
 
-    // Command 1: !test or !t
+    // Command 1: !test
     if (cleanContent === '!test' || cleanContent === '!t') {
         return message.reply('Up And Running!! <:emoji_71:1538659767210475611>');
     } 
     
-    // Command 2: !help or !h
+    // Command 2: !help
     else if (cleanContent === '!help' || cleanContent === '!h') {
         return message.reply('Hey! Im MTH Bot, I usually take care of Moderation, Rewards, and More!');
     }
 
-    // Command 3: !list or !l (NEW COMMAND)
+    // Command 3: !list
     else if (cleanContent === '!list' || cleanContent === '!l') {
         const userIds = Object.keys(activeBoosters);
-        
         if (userIds.length === 0) {
             return message.reply('📝 There are currently **no users** on the active Booster-1 list.');
         }
-
-        // Create a clickable mention list for every user saved in the file
         const listText = userIds.map((id, index) => `${index + 1}. <@${id}>`).join('\n');
         return message.reply(`📝 **Current Booster-1 List:**\n${listText}`);
     }
 
-    // Command 4: Booster-1 variations
+    // Command 4: !booster-test Simulator (NEW COMMAND)
+    // Shortcuts: !booster-test, ! booster-test, !b-test, ! b-test, b-test, b1-test
+    else if (
+        cleanContent === '!booster-test' ||
+        cleanContent === '! booster-test' ||
+        cleanContent === '!b-test' ||
+        cleanContent === '! b-test' ||
+        cleanContent === 'b-test' ||
+        cleanContent === 'b1-test'
+    ) {
+        const hasRole = message.member.roles.cache.has(REQUIRED_ROLE_ID);
+        
+        try {
+            if (hasRole) {
+                // If you already have it, remove it to simulate an expired boost
+                await message.member.roles.remove(REQUIRED_ROLE_ID);
+                return message.reply('🧪 **Simulation:** Removed your booster role to test the expired boost sequence!');
+            } else {
+                // If you don't have it, give it to simulate a brand new boost
+                await message.member.roles.add(REQUIRED_ROLE_ID);
+                return message.reply('🧪 **Simulation:** Granted you the booster role to test the new boost sequence!');
+            }
+        } catch (err) {
+            console.error(err);
+            return message.reply('❌ Unable to change your roles. Please check that the MTH Bot role is moved **ABOVE** the booster role in your server settings hierarchy, otherwise Discord blocks the bot from granting it!');
+        }
+    }
+
+    // Command 5: Manual Fallback Option
     else if (
         cleanContent.startsWith('!booster-1') || 
         cleanContent.startsWith('! booster-1') || 
         cleanContent.startsWith('!b-1') || 
         cleanContent.startsWith('! b-1')
     ) {
-        // 🔒 PLACE YOUR ALLOWED ROLE ID INSIDE THE QUOTES BELOW:
-        const requiredRoleId = "1538016060253413396";
-
-        if (!message.member.roles.cache.has(requiredRoleId)) {
+        if (!message.member.roles.cache.has(REQUIRED_ROLE_ID)) {
             return message.reply('❌ You do not have permission to use this command!');
         }
 
@@ -114,7 +184,7 @@ client.on('messageCreate', async (message) => {
         if (!targetUser) return message.reply('❌ Please ping a person!');
 
         if (activeBoosters[targetUser.id]) {
-            return message.reply(`⚠️ ${targetUser} is already on the daily Booster-1 list! You cannot add them again.`);
+            return message.reply(`⚠️ ${targetUser} is already on the daily Booster-1 list!`);
         }
 
         activeBoosters[targetUser.id] = {
@@ -122,7 +192,6 @@ client.on('messageCreate', async (message) => {
             channelId: message.channel.id,
             lastRun: Date.now()
         };
-
         saveBoostersData();
 
         try {
@@ -131,7 +200,7 @@ client.on('messageCreate', async (message) => {
             message.reply(`✅ Added ${targetUser} to the daily Booster-1 list and saved their data securely.`);
         } catch (err) {
             console.error(err);
-            message.reply('❌ Failed to connect to UnbelievaBoat. Double-check your UNB_TOKEN in Railway variables!');
+            message.reply('❌ Failed to connect to UnbelievaBoat.');
         }
     }
     
@@ -139,6 +208,8 @@ client.on('messageCreate', async (message) => {
         return message.reply('❌ Unknown Command. Type `!help` to see what I can do!');
     }
 });
+
+client.on('error', console.error);
 
 client.login(process.env.DISCORD_TOKEN);
     
