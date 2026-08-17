@@ -84,7 +84,7 @@ client.on('messageCreate', async (message) => {
     // Command 3: !Booster-1 @person
     else if (message.content.startsWith('!Booster-1')) {
         // 🔒 PLACE YOUR ALLOWED ROLE ID INSIDE THE QUOTES BELOW:
-        const requiredRoleId = "";
+        const requiredRoleId = "1536491514341888050";
 
         // Check if the user has the required role
         if (!message.member.roles.cache.has(requiredRoleId)) {
