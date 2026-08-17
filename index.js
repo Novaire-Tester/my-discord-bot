@@ -1,8 +1,4 @@
-const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
-const { Client: UnbClient } = require('unb-api');
-const fs = require('fs');
-const path = require('path');
-
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');const { Client: UnbClient } = require('unb-api');const fs = require('fs');const path = require('path');
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -11,22 +7,9 @@ const client = new Client({
         GatewayIntentBits.MessageContent
     ]
 });
-
-const unb = new UnbClient(process.env.UNB_TOKEN);
-const dataFilePath = path.join(__dirname, 'boosters.json');
-let activeBoosters = {};
-
-// ⚙️ SYSTEM CONFIGURATION
-const REQUIRED_ROLE_ID = "1538016060253413396"; 
-const BOOSTER_CHAT_CHANNEL_ID = "1538986835210936380"; 
-
-// 🎯 AUTO-DROP CONFIGURATION
-let activeMessageCount = 0;
-let lastDropTime = 0;
-let currentActiveDrop = null; 
-const MESSAGES_NEEDED_FOR_DROP = 15; 
-const DROP_COOLDOWN_MS = 1800000; 
-
+const unb = new UnbClient(process.env.UNB_TOKEN);const dataFilePath = path.join(__dirname, 'boosters.json');let activeBoosters = {};
+// ⚙️ SYSTEM CONFIGURATIONconst REQUIRED_ROLE_ID = "1538016060253413396"; const BOOSTER_CHAT_CHANNEL_ID = "1538986835210936380"; const HEY_TARGET_CHANNEL_ID = "1533109256918663278"; 
+// 🎯 AUTO-DROP CONFIGURATIONlet activeMessageCount = 0;let lastDropTime = 0;let currentActiveDrop = null; const MESSAGES_NEEDED_FOR_DROP = 15; const DROP_COOLDOWN_MS = 1800000; 
 try {
     if (fs.existsSync(dataFilePath)) {
         const fileData = fs.readFileSync(dataFilePath, 'utf8');
@@ -36,7 +19,6 @@ try {
 } catch (err) {
     console.error('Error loading boosters file, starting fresh:', err);
 }
-
 function saveBoostersData() {
     try {
         fs.writeFileSync(dataFilePath, JSON.stringify(activeBoosters, null, 2), 'utf8');
@@ -77,7 +59,6 @@ client.once('ready', () => {
         }
     }, 3600000); 
 });
-
 // 🤖 AUTOMATIC BOOSTER DETECTOR (Welcome & Goodbye Tracker)
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
     const hadRole = oldMember.roles.cache.has(REQUIRED_ROLE_ID);
@@ -151,7 +132,7 @@ client.on('messageCreate', async (message) => {
     }
 
     // Command verification check
-    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-') || cleanContent.startsWith('b1') || cleanContent.startsWith('drop');
+    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-') || cleanContent.startsWith('b1') || cleanContent.startsWith('drop') || cleanContent.startsWith('hey') || cleanContent.startsWith('hy');
     if (!isCommand) return; 
 
     // Command 1: !test
@@ -174,7 +155,25 @@ client.on('messageCreate', async (message) => {
         return message.reply(`📝 **Current Booster-1 List:**\n${listText}`);
     }
 
-    // Command 4: !drop Manual Overrides
+    // Command 4: !hey (Remote Channel Target)
+    else if (
+        cleanContent === '!hey' ||
+        cleanContent === '! hey' ||
+        cleanContent === '!hy' ||
+        cleanContent === '! hy' ||
+        cleanContent === 'hey' ||
+        cleanContent === 'hy'
+    ) {
+        const targetChannel = message.guild.channels.cache.get(HEY_TARGET_CHANNEL_ID);
+        if (targetChannel) {
+            await targetChannel.send('Hey!');
+            return message.reply(`✅ Sent "Hey!" to <#${HEY_TARGET_CHANNEL_ID}>`);
+        } else {
+            return message.reply('❌ Could not find that channel. Ensure the bot has permissions to view and send messages there!');
+        }
+    }
+
+    // Command 5: !drop Manual Overrides
     else if (
         cleanContent === '!drop' ||
         cleanContent === '! drop' ||
@@ -192,10 +191,10 @@ client.on('messageCreate', async (message) => {
         }
 
         currentActiveDrop = { amount: 250000 };
-        return message.channel.send('🎁💰 **MANUAL ADMIN DROP EVENT!** 💰🎁\nAn Administrator dropped a massive reward! A bag containing **250,000 cash** is floating in chat!\n\n👉 Type **`CLAIM`** right now to snatch it!');
+        return message.channel.send('🎁💰 **MANUAL SOMEONE DROP EVENT!** 💰🎁\nSomeone dropped a massive reward! A bag containing **250,000 cash** is floating in chat!\n\n👉 Type **`CLAIM`** right now to snatch it!');
     }
 
-    // Command 5: !booster-test Simulator
+    // Command 6: !booster-test Simulator
     else if (
         cleanContent === '!booster-test' ||
         cleanContent === '! booster-test' ||
@@ -220,7 +219,7 @@ client.on('messageCreate', async (message) => {
         }
     }
 
-    // Command 6: Manual Fallback Option
+    // Command 7: Manual Fallback Option
     else if (
         cleanContent.startsWith('!booster-1') || 
         cleanContent.startsWith('! booster-1') || 
@@ -241,26 +240,22 @@ client.on('messageCreate', async (message) => {
         activeBoosters[targetUser.id] = {
             guildId: message.guild.id,
             channelId: message.channel.id,
-            lastRun: Date.now()
-        };
-        saveBoostersData();
 
-        try {
-            await unb.editUserBalance(message.guild.id, targetUser.id, { cash: 50000 });
-            message.channel.send(`💰 Successfully added 50,000 cash to ${targetUser}'s UnbelievaBoat balance!`);
-            message.reply(`✅ Added ${targetUser} to the daily Booster-1 list and saved their data securely.`);
-        } catch (err) {
-            console.error(err);
-            message.reply('❌ Failed to connect to UnbelievaBoat.');
-        }
-    }
-    
-    else if (cleanContent.startsWith('!')) {
-        return message.reply('❌ Unknown Command. Type `!help` to see what I can do!');
-    }
+lastRun: Date.now()
+};
+saveBoostersData();
+try {
+await unb.editUserBalance(message.guild.id, targetUser.id, { cash: 50000 });
+message.channel.send(💰 Successfully added 50,000 cash to ${targetUser}'s UnbelievaBoat balance!);
+message.reply(✅ Added ${targetUser} to the daily Booster-1 list and saved their data securely.);
+} catch (err) {
+console.error(err);
+message.reply('❌ Failed to connect to UnbelievaBoat.');
+}
+}
+else if (cleanContent.startsWith('!')) {
+return message.reply('❌ Unknown Command. Type !help to see what I can do!');
+}
 });
-
 client.on('error', console.error);
-
 client.login(process.env.DISCORD_TOKEN);
-                
