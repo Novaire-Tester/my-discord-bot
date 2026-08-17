@@ -50,7 +50,7 @@ client.on('messageCreate', (message) => {
         const targetUser = message.mentions.users.first();
         
         if (!targetUser) {
-            return message.reply('Uh oh! Please ping a person! Example: `!Booster-1 @person`');
+            return message.reply('Uh oh!! Please ping a person! Example: `!Booster-1 @person`');
         }
 
         // Add them to the daily cycle
