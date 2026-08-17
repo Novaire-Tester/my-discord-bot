@@ -68,12 +68,10 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
-    // Clean up spaces and force lowercase to handle variations smoothly
     const cleanContent = message.content.replace(/\s+/g, ' ').trim().toLowerCase();
 
-    // 1. Strictly verify the message starts with an allowed prefix/shortcut
     const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-1') || cleanContent.startsWith('b1');
-    if (!isCommand) return; // Exit immediately if it's just normal chat text
+    if (!isCommand) return; 
 
     // Command 1: !test or !t
     if (cleanContent === '!test' || cleanContent === '!t') {
@@ -85,12 +83,25 @@ client.on('messageCreate', async (message) => {
         return message.reply('Hey! Im MTH Bot, I usually take care of Moderation, Rewards, and More!');
     }
 
-    // Command 3: Booster-1 variations
+    // Command 3: !list or !l (NEW COMMAND)
+    else if (cleanContent === '!list' || cleanContent === '!l') {
+        const userIds = Object.keys(activeBoosters);
+        
+        if (userIds.length === 0) {
+            return message.reply('📝 There are currently **no users** on the active Booster-1 list.');
+        }
+
+        // Create a clickable mention list for every user saved in the file
+        const listText = userIds.map((id, index) => `${index + 1}. <@${id}>`).join('\n');
+        return message.reply(`📝 **Current Booster-1 List:**\n${listText}`);
+    }
+
+    // Command 4: Booster-1 variations
     else if (
         cleanContent.startsWith('!booster-1') || 
         cleanContent.startsWith('! booster-1') || 
-        cleanContent.startsWith('b-1') || 
-        cleanContent.startsWith('b1')
+        cleanContent.startsWith('!b-1') || 
+        cleanContent.startsWith('! b-1')
     ) {
         // 🔒 PLACE YOUR ALLOWED ROLE ID INSIDE THE QUOTES BELOW:
         const requiredRoleId = "1538016060253413396";
@@ -124,11 +135,10 @@ client.on('messageCreate', async (message) => {
         }
     }
     
-    // 🚨 Fallback: If it starts with ! but matches nothing above
     else if (cleanContent.startsWith('!')) {
         return message.reply('❌ Unknown Command. Type `!help` to see what I can do!');
     }
 });
 
 client.login(process.env.DISCORD_TOKEN);
-        
+    
