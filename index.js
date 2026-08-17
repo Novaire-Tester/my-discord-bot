@@ -14,9 +14,9 @@ client.once('ready', () => {
 
 client.on('messageCreate', (message) => {
     if (message.author.bot) return;
-
-    if (message.content === '!ping') {
-        message.reply('Pong! 🏓');
+    // Reply to !test
+    if (message.content === '!test') {
+        message.reply('Up And Running!! :emoji_71:);
     }
 });
 
