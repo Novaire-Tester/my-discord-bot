@@ -1,6 +1,6 @@
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const { Client: UnbClient } = require('unb-api');
-const fs = require('fs'); // Tool to save data to a file
+const fs = require('fs');
 const path = require('path');
 
 const client = new Client({
@@ -15,7 +15,6 @@ const unb = new UnbClient(process.env.UNB_TOKEN);
 const dataFilePath = path.join(__dirname, 'boosters.json');
 let activeBoosters = {};
 
-// Load saved data when the bot starts up
 try {
     if (fs.existsSync(dataFilePath)) {
         const fileData = fs.readFileSync(dataFilePath, 'utf8');
@@ -26,7 +25,6 @@ try {
     console.error('Error loading boosters file, starting fresh:', err);
 }
 
-// Helper function to easily save data anytime it changes
 function saveBoostersData() {
     try {
         fs.writeFileSync(dataFilePath, JSON.stringify(activeBoosters, null, 2), 'utf8');
@@ -39,7 +37,6 @@ client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity('!test', { type: ActivityType.Listening });
 
-    // 24-Hour Automated Loop (Checks every hour)
     setInterval(async () => {
         const now = Date.now();
         let dataChanged = false;
@@ -71,22 +68,33 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
-    // Command 1: !test
-    if (message.content === '!test') {
-        message.reply('Up And Running!! <:emoji_71:1538659767210475611>');
+    // Clean up spaces and force lowercase to handle variations smoothly
+    const cleanContent = message.content.replace(/\s+/g, ' ').trim().toLowerCase();
+
+    // 1. Strictly verify the message starts with an allowed prefix/shortcut
+    const isCommand = cleanContent.startsWith('!') || cleanContent.startsWith('b-1') || cleanContent.startsWith('b1');
+    if (!isCommand) return; // Exit immediately if it's just normal chat text
+
+    // Command 1: !test or !t
+    if (cleanContent === '!test' || cleanContent === '!t') {
+        return message.reply('Up And Running!! <:emoji_71:1538659767210475611>');
     } 
     
-    // Command 2: !help
-    else if (message.content === '!help') {
-        message.reply('Hey! Im MTH Bot, I usually take care of Moderation, Rewards, and More!');
+    // Command 2: !help or !h
+    else if (cleanContent === '!help' || cleanContent === '!h') {
+        return message.reply('Hey! Im MTH Bot, I usually take care of Moderation, Rewards, and More!');
     }
 
-    // Command 3: !Booster-1 @person
-    else if (message.content.startsWith('!Booster-1')) {
+    // Command 3: Booster-1 variations
+    else if (
+        cleanContent.startsWith('!booster-1') || 
+        cleanContent.startsWith('! booster-1') || 
+        cleanContent.startsWith('b-1') || 
+        cleanContent.startsWith('b1')
+    ) {
         // 🔒 PLACE YOUR ALLOWED ROLE ID INSIDE THE QUOTES BELOW:
-        const requiredRoleId = "1536491514341888050";
+        const requiredRoleId = "1538016060253413396";
 
-        // Check if the user has the required role
         if (!message.member.roles.cache.has(requiredRoleId)) {
             return message.reply('❌ You do not have permission to use this command!');
         }
@@ -94,19 +102,16 @@ client.on('messageCreate', async (message) => {
         const targetUser = message.mentions.users.first();
         if (!targetUser) return message.reply('❌ Please ping a person!');
 
-        // 🛡️ Duplicate protection check
         if (activeBoosters[targetUser.id]) {
             return message.reply(`⚠️ ${targetUser} is already on the daily Booster-1 list! You cannot add them again.`);
         }
 
-        // Save tracking information to memory
         activeBoosters[targetUser.id] = {
             guildId: message.guild.id,
             channelId: message.channel.id,
             lastRun: Date.now()
         };
 
-        // Write the data to your permanent boosters.json file
         saveBoostersData();
 
         try {
@@ -117,6 +122,11 @@ client.on('messageCreate', async (message) => {
             console.error(err);
             message.reply('❌ Failed to connect to UnbelievaBoat. Double-check your UNB_TOKEN in Railway variables!');
         }
+    }
+    
+    // 🚨 Fallback: If it starts with ! but matches nothing above
+    else if (cleanContent.startsWith('!')) {
+        return message.reply('❌ Unknown Command. Type `!help` to see what I can do!');
     }
 });
 
