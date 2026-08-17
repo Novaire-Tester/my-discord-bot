@@ -16,7 +16,7 @@ client.on('messageCreate', (message) => {
     if (message.author.bot) return;
     // Reply to !test
     if (message.content === '!test') {
-        message.reply('Up And Running!! :emoji_71:);
+        message.reply('Up And Running!! :emoji_71:');
     }
 });
 
