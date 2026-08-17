@@ -1,4 +1,5 @@
 const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client: UnbClient } = require('unb-api'); // UnbelievaBoat tool
 
 const client = new Client({
     intents: [
@@ -8,31 +9,39 @@ const client = new Client({
     ]
 });
 
-// This object will temporarily hold active boosters while the bot stays online
+// Connect to UnbelievaBoat using the token we added to Railway
+const unb = new UnbClient(process.env.UNB_TOKEN);
+
 const activeBoosters = {};
 
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity('!test', { type: ActivityType.Listening });
 
-    // Check every hour (3600000ms) to see if it's time to run the daily command
-    setInterval(() => {
+    // 24-Hour Automated Loop
+    setInterval(async () => {
         const now = Date.now();
         for (const userId in activeBoosters) {
             const data = activeBoosters[userId];
-            // If 24 hours (86400000ms) have passed since the last run
             if (now - data.lastRun >= 86400000) {
-                const channel = client.channels.cache.get(data.channelId);
-                if (channel) {
-                    channel.send(`;add-money <@${userId}> 50,000`);
-                    data.lastRun = now; // Reset the 24-hour timer
+                try {
+                    // This directly updates their UnbelievaBoat wallet!
+                    await unb.editUserBalance(data.guildId, userId, { cash: 50000 });
+                    
+                    const channel = client.channels.cache.get(data.channelId);
+                    if (channel) {
+                        channel.send(`💰 **Daily Booster-1 payout!** Added 50,000 cash to <@${userId}> via UnbelievaBoat.`);
+                    }
+                    data.lastRun = now;
+                } catch (err) {
+                    console.error('Failed to add UB money daily:', err);
                 }
             }
         }
     }, 3600000); 
 });
 
-client.on('messageCreate', (message) => {
+client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
     // Command 1: !test
@@ -48,20 +57,25 @@ client.on('messageCreate', (message) => {
     // Command 3: !Booster-1 @person
     else if (message.content.startsWith('!Booster-1')) {
         const targetUser = message.mentions.users.first();
-        
-        if (!targetUser) {
-            return message.reply('Uh oh!! Please ping a person! Example: `!Booster-1 @person`');
-        }
+        if (!targetUser) return message.reply('Uh Oh! Please ping a person!');
 
-        // Add them to the daily cycle
+        // Save tracking information
         activeBoosters[targetUser.id] = {
+            guildId: message.guild.id,
             channelId: message.channel.id,
-            lastRun: Date.now() // Sets the starting point to right now
+            lastRun: Date.now()
         };
 
-        // Send the very first immediate message right now
-        message.channel.send(`;add-money ${targetUser} 50,000`);
-        message.reply(`✓ Added ${targetUser} to the Booster 1 Perks list. I will repeat this command every 24 hours!`);
+        try {
+            // Instantly add the first 50k to UnbelievaBoat
+            await unb.editUserBalance(message.guild.id, targetUser.id, { cash: 50000 });
+            
+            message.channel.send(`✓✓ Successfully added 50,000 cash to ${targetUser}'s UnbelievaBoat balance!`);
+            message.reply(`✓✓ Added ${targetUser} to the daily Booster-1 list.`);
+        } catch (err) {
+            console.error(err);
+            message.reply('Uh Oh! Failed to connect to UnbelievaBoat. Double-check your UNB_TOKEN in Railway variables!');
+        }
     }
 });
 
