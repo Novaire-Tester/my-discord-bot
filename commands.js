@@ -29,7 +29,7 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
-                .setTitle("📜 Public Commands List")
+                .setTitle("✿⁠ Public Commands List")
                 .setDescription("Standard operational utilities accessible by everyone.")
                 .addFields(
                     { name: "Prefix", value: `\`${config.PREFIX}\``, inline: true },
@@ -48,18 +48,18 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor("#ED4245") // Red alert color for staff eyes only
-                .setTitle("🛡️ Internal Staff Commands")
+                .setTitle("❀ Internal Staff Commands")
                 .setDescription("Secure dashboard utility list restricted to authorized management roles.")
                 .addFields(
                     { name: "▫ :staff-commands (sc)", value: "Displays this hidden staff directory." },
                     { name: "▫ :booster-rewards (br)", value: "Opens interactive prize control panels with multi-select buttons." },
                     { name: "▫ :moderation (mod)", value: "Reviews advanced staff logging options." },
-                    { name: "▫ :mute @user (time) (why)", value: "🔇 Applies the configured mute server role restrictions." },
-                    { name: "▫ :unmute @user", value: "🔊 Clears the active mute restriction layer instantly." },
-                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "🔨 Executes administrative user ban infrastructure records." },
-                    { name: "▫ :unban ID", value: "🔓 Removes explicit target block restrictions using their user ID." },
-                    { name: "▫ :warn @user (why)", value: "⚠️ Logs a formal rule infraction warning directly to history files." },
-                    { name: "▫ :offenses @user (history, logs)", value: "🗃️ Reviews comprehensive logged infraction history files for a user." }
+                    { name: "▫ :mute @user (time) (why)", value: "Applies the configured mute server role restrictions." },
+                    { name: "▫ :unmute @user", value: "Clears the active mute restriction layer instantly." },
+                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "Executes administrative user ban infrastructure records." },
+                    { name: "▫ :unban ID", value: "Removes explicit target block restrictions using their user ID." },
+                    { name: "▫ :warn @user (why)", value: "Logs a formal rule infraction warning directly to history files." },
+                    { name: "▫ :offenses @user (history, logs)", value: "Reviews comprehensive logged infraction history files for a user." }
                 );
             return message.reply({ embeds: [embed] });
         }
@@ -77,12 +77,12 @@ module.exports = {    commandsList: {
                     { name: "▫ :staff-commands (sc)", value: "Displays this hidden staff directory." },
                     { name: "▫ :booster-rewards (br)", value: "Opens interactive prize control panels with multi-select buttons." },
                     { name: "▫ :moderation (mod)", value: "Reviews advanced staff logging options." },
-                    { name: "▫ :mute @user (time) (why)", value: "🔇 Applies the configured mute server role restrictions." },
+                    { name: "▫ :mute @user (time) (why)", value: "Applies the configured mute server role restrictions." },
                     { name: "▫ :unmute @user", value: "🔊 Clears the active mute restriction layer instantly." },
-                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "🔨 Executes administrative user ban infrastructure records." },
-                    { name: "▫ :unban ID", value: "🔓 Removes explicit target block restrictions using their user ID." },
-                    { name: "▫ :warn @user (why)", value: "⚠️ Logs a formal rule infraction warning directly to history files." },
-                    { name: "▫ :offenses @user (history, logs)", value: "🗃️ Reviews comprehensive logged infraction history files for a user." }
+                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "Executes administrative user ban infrastructure records." },
+                    { name: "▫ :unban ID", value: "Removes explicit target block restrictions using their user ID." },
+                    { name: "▫ :warn @user (why)", value: "Logs a formal rule infraction warning directly to history files." },
+                    { name: "▫ :offenses @user (history, logs)", value: "Reviews comprehensive logged infraction history files for a user." }
                 );
             return message.reply({ embeds: [embed] });
         }
@@ -106,7 +106,7 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
-                .setTitle("ℹ️ System Balance Notice")
+                .setTitle("Value Notice")
                 .setDescription(`Database values are fully tracked and verified by our secondary system infrastructure: <@${config.SECONDARY_BOT_ID}>.`);
             return message.reply({ embeds: [embed] });
         }
@@ -118,7 +118,7 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle }) => {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
-                .setTitle("🎮 Booster Rewards Hub")
+                .setTitle("✧ Booster Rewards Hub ☆")
                 .setDescription("Welcome to the configuration area. Select an option below.");
             const row = new ActionRowBuilder().addComponents(
                 new ButtonBuilder().setCustomId('open_dashboard').setLabel('🎛️ Dashboard').setStyle(ButtonStyle.Primary),
@@ -134,7 +134,7 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
-                .setTitle("🛡️ Staff Moderation Dashboard")
+                .setTitle("✦ Staff Moderation Dashboard")
                 .setDescription("System moderation layer online. Use standard parameters like `:mute`, `:ban`, `:warn`, or `:offenses` to process actions.");
             return message.reply({ embeds: [embed] });
         }
@@ -147,7 +147,7 @@ module.exports = {    commandsList: {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const target = message.mentions.members.first();
-            if (!target) return message.reply("❌ Error: Missing configuration parameters. Format: `:mute @player (duration) (reason)`");
+            if (!target) return message.reply("? Error: Missing configuration parameters. Format: `:mute @player (duration) (reason)`");
             
             const args = message.content.split(/ +/).slice(2);
             const duration = args[0] || "Not Specified";
@@ -159,15 +159,15 @@ module.exports = {    commandsList: {
                 
                 const embed = new EmbedBuilder()
                     .setColor("#E67E22")
-                    .setTitle("🔇 Member Muted Successfully")
+                    .setTitle("✧ Member Muted Successfully")
                     .setDescription(`Target <@${target.id}> has been restricted.`)
                     .addFields(
-                        { name: "🕒 Duration", value: duration, inline: true },
-                        { name: "📝 Reason", value: reason, inline: true }
+                        { name: "❀ Duration", value: duration, inline: true },
+                        { name: "☆ Reason", value: reason, inline: true }
                     );
                 return message.reply({ embeds: [embed] });
             } catch (e) {
-                return message.reply("❌ API Operational Failure: Move bot hierarchy role higher than targets.");
+                return message.reply("? API Operational Failure: Move bot hierarchy role higher than targets.");
             }
         }
     },
@@ -177,16 +177,16 @@ module.exports = {    commandsList: {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const target = message.mentions.members.first();
-            if (!target) return message.reply("❌ Error: Specify target. Format: `:unmute @player`");
+            if (!target) return message.reply("? Error: Specify target. Format: `:unmute @player`");
 
             try {
                 await target.roles.remove(config.MUTE_ROLE_ID);
                 const embed = new EmbedBuilder()
                     .setColor("#2ECC71")
-                    .setDescription(`🔊 <@${target.id}> has been unmuted successfully.`);
+                    .setDescription(`𖹭 <@${target.id}> has been unmuted successfully.`);
                 return message.reply({ embeds: [embed] });
             } catch (e) {
-                return message.reply("❌ Execution Error: Could not remove restriction layer.");
+                return message.reply("? Execution Error: Could not remove restriction layer.");
             }
         }
     },
@@ -196,7 +196,7 @@ module.exports = {    commandsList: {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const target = message.mentions.members.first();
-            if (!target) return message.reply("❌ Error: Format: `:ban @player (temp/perm) (time/if temp) (reason)`");
+            if (!target) return message.reply("? Error: Format: `:ban @player (temp/perm) (time/if temp) (reason)`");
 
             const args = message.content.split(/ +/).slice(2);
             const mode = args[0] ? args[0].toLowerCase() : "perm";
@@ -216,16 +216,16 @@ module.exports = {    commandsList: {
 
                 const embed = new EmbedBuilder()
                     .setColor("#ED4245")
-                    .setTitle("🔨 Member Banned Successfully")
+                    .setTitle("✦ Member Banned Successfully")
                     .setDescription(`Target tracking ID context processed out of guild environment.`)
                     .addFields(
-                        { name: "🗂️ Scope Mode", value: mode.toUpperCase(), inline: true },
-                        { name: "🕒 Length", value: duration, inline: true },
-                        { name: "📝 Reason", value: reason, inline: false }
+                        { name: "♡ Scope Mode", value: mode.toUpperCase(), inline: true },
+                        { name: "✧ Length", value: duration, inline: true },
+                        { name: "✿⁠ Reason", value: reason, inline: false }
                     );
                 return message.reply({ embeds: [embed] });
             } catch (e) {
-                return message.reply("❌ Security Core Blockage: Check target role authority tiers.");
+                return message.reply("? Security Core Blockage: Check target role authority tiers.");
             }
         }
     },
@@ -236,16 +236,16 @@ module.exports = {    commandsList: {
         execute: async (message, config, { EmbedBuilder }) => {
             const args = message.content.split(/ +/).slice(1);
             const targetId = args[0];
-            if (!targetId) return message.reply("❌ Parameter tracking failed: Provide target numeric ID profile string. Format: `:unban 1234567890`");
+            if (!targetId) return message.reply("? Parameter tracking failed: Provide target numeric ID profile string. Format: `:unban 1234567890`");
 
             try {
                 await message.guild.members.unban(targetId);
                 const embed = new EmbedBuilder()
                     .setColor("#2ECC71")
-                    .setDescription(`✅ User Profile ID \`${targetId}\` unbanned successfully.`);
+                    .setDescription(`✓ User Profile ID \`${targetId}\` unbanned successfully.`);
                 return message.reply({ embeds: [embed] });
             } catch (e) {
-                return message.reply("❌ Directory Tracking Alert: ID element target is not currently banned.");
+                return message.reply("? Directory Tracking Alert: ID element target is not currently banned.");
             }
         }
     },
@@ -255,16 +255,16 @@ module.exports = {    commandsList: {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const target = message.mentions.members.first();
-            if (!target) return message.reply("❌ Error: Format parameters missing. Format: `:warn @player (reason)`");
+            if (!target) return message.reply("? Error: Format parameters missing. Format: `:warn @player (reason)`");
 
             const reason = message.content.split(/ +/).slice(2).join(" ") || "No reason provided.";
             addOffense(target.id, "WARN", `Reason: ${reason} | By: ${message.author.tag}`);
 
             const embed = new EmbedBuilder()
                 .setColor("#F1C40F")
-                .setTitle("⚠️ Formal Warning Issued")
+                .setTitle("❀ Formal Warning Issued")
                 .setDescription(`<@${target.id}> has received an official account warning update.`)
-                .addFields({ name: "📝 Logged Reason", value: reason });
+                .addFields({ name: "𖹭 Logged Reason", value: reason });
             return message.reply({ embeds: [embed] });
         }
     },
@@ -274,16 +274,16 @@ module.exports = {    commandsList: {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const userTarget = message.mentions.users.first();
-            if (!userTarget) return message.reply("❌ Parameter verification missing. Format: `:offenses @player`");
+            if (!userTarget) return message.reply("MTUzODI3Nzc1Nzg3ODgwNDUyMg.GJ8ZAv.7AQ8_czw4UWN81JIfMnmaD8GiRrjUsvX29Ils8✧ Parameter verification missing. Format: `:offenses @player`");
 
             const history = getHistory();
             const userLogs = history[userTarget.id] || [];
 
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
-                .setTitle(`🗃️ Infraction Records for ${userTarget.username}`)
+                .setTitle(`Offenses for ${userTarget.username}`)
                 .setDescription(userLogs.length === 0 
-                    ? "✨ Clean Record. No logged infractions found inside history parameters." 
+                    ? "☆ Clean Record. No logged offenses found inside history parameters." 
                     : userLogs.map((log, idx) => `\`[#${idx + 1}]\` **[${log.type}]** - ${log.details} *(Logged: ${log.timestamp})*`).join('\n\n'));
 
             return message.reply({ embeds: [embed] });
@@ -301,10 +301,10 @@ module.exports = {    commandsList: {
             const boosters = members.filter(member => member.premiumSinceTimestamp !== null);
 
             // 3. Build the display description text list
-            let listText = "✨ **Current Supporters:**\n";
+            let listText = "☆ **Current Supporters:**\n";
 
             if (boosters.size === 0) {
-                listText += "ℹ️ *There are no active boosters on the server right now.*";
+                listText += "? *There are no active boosters on the server right now.*";
             } else {
                 // Map out every booster into a mention string (e.g. • @User)
                 listText += boosters.map(member => `• <@${member.user.id}>`).join("\n");
@@ -313,7 +313,7 @@ module.exports = {    commandsList: {
             // 4. Send the beautiful, live booster embed
             const embed = new EmbedBuilder()
                 .setColor("#F47FFF") // Pink Discord booster color
-                .setTitle("💎 Active Server Boosters")
+                .setTitle("__Active Server Boosters__")
                 .setDescription(`Thank you to everyone supporting our community!\n\n${listText}`)
                 .setFooter({ text: `Total Active Boosters: ${boosters.size}` })
                 .setTimestamp();
@@ -321,4 +321,28 @@ module.exports = {    commandsList: {
             return message.reply({ embeds: [embed] });
         }
     }
-};
+},    
+    boosterCommandsList: {
+        name: "booster-commands",
+        shortcuts: ["bc"],
+        staffOnly: false,
+        execute: async (message, config) => {
+            // Check if the user physically has the server booster role
+            const isBooster = message.member.roles.cache.has(config.BOOSTER_ROLE_ID);
+            if (!isBooster) {
+                return message.reply({ 
+                    content: "Error: This command directory is strictly restricted to active server boosters.", 
+                    ephemeral: true 
+                });
+            }
+
+            const menuText = 
+                "■ ────────────── Booster Commands ────────────── ■\n\n" +
+                "Available rewards commands and custom parameters for server supporters:\n\n" +
+                ":claim-daily || Claim your active 24-hour booster economy payout.\n" +
+                ":booster-perks || View an index of custom roles and perks available to your tier.\n\n" +
+                "■ ────────────────────────────────────────────── ■";
+
+            return message.reply({ content: menuText, ephemeral: true });
+        }
+    };
