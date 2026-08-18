@@ -30,14 +30,14 @@ module.exports = {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR || "#5865F2")
-                .setTitle("■ ────────── Commands List ────────── ■")
+                .setTitle("❀───»───✧ Commands List ✧───«───❀")
                 .setDescription(
                     "Standard operational utilities accessible by everyone:\n\n" +
-                    "**:commands** (cmds, c) || Displays this public index directory.\n" +
-                    "**:help** (h) || Displays a short overview of bot features.\n" +
-                    "**:values** (v) || Clarifies balance currency management authorities.\n" +
-                    "**:server-boosters** (boosters, sb) || Scans live server to display active boosters.\n" +
-                    "**:booster-commands** (bc) || Displays hidden booster reward directories."
+                    "**:commands** (cmds, c) | Displays this public index directory.\n" +
+                    "**:help** (h) | Displays a short overview of bot features.\n" +
+                    "**:values** (v) | Clarifies balance currency management authorities.\n" +
+                    "**:server-boosters** (boosters, sb) | Scans live server to display active boosters.\n" +
+                    "**:booster-commands** (bc) | Displays hidden booster reward directories."
                 );
             return message.reply({ embeds: [embed] });
         }
@@ -49,18 +49,18 @@ module.exports = {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor("#ED4245")
-                .setTitle("■ ────────── Staff Commands ────────── ■")
+                .setTitle("❀───»───✧ Staff Commands ✧───«───❀")
                 .setDescription(
                     "Secure utility list restricted to authorized management roles:\n\n" +
-                    "**:staff-commands** (sc) || Displays this directory.\n" +
-                    "**:booster-rewards** (br) || Opens interactive prize control panels.\n" +
-                    "**:moderation** (mod) || Reviews advanced staff logging options.\n" +
-                    "**:mute** @user (time) (why) || Applies mute server role restrictions.\n" +
-                    "**:unmute** @user || Clears active mute restriction layer.\n" +
-                    "**:ban** @user (temp/perm) (time) (why) || Executes user ban records.\n" +
-                    "**:unban** ID || Removes block restrictions using user ID.\n" +
-                    "**:warn** @user (why) || Logs formal rule infraction warnings.\n" +
-                    "**:offenses** @user || Reviews comprehensive logged history records."
+                    "**:staff-commands** (sc) | Displays this directory.\n" +
+                    "**:booster-rewards** (br) | Opens interactive prize control panels.\n" +
+                    "**:moderation** (mod) | Reviews advanced staff logging options.\n" +
+                    "**:mute** @user (time) (why) | Applies mute server role restrictions.\n" +
+                    "**:unmute** @user | Clears active mute restriction layer.\n" +
+                    "**:ban** @user (temp/perm) (time) (why) | Executes user ban records.\n" +
+                    "**:unban** ID | Removes block restrictions using user ID.\n" +
+                    "**:warn** @user (why) | Logs formal rule infraction warnings.\n" +
+                    "**:offenses** @user | Reviews comprehensive logged history records."
                 );
             return message.reply({ embeds: [embed] });
         }
