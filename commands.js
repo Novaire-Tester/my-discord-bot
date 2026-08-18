@@ -264,5 +264,37 @@ module.exports = {
 
             return message.reply({ embeds: [embed] });
         }
+    },
+        serverBoosters: {
+        name: "server-boosters",
+        shortcuts: ["boosters", "sb"],
+        staffOnly: false,
+        execute: async (message, config, { EmbedBuilder }) => {
+            // 1. Fetch all members live from the server cache to make sure we don't miss anyone
+            const members = await message.guild.members.fetch();
+            
+            // 2. Filter down to ONLY members who are currently boosting
+            const boosters = members.filter(member => member.premiumSinceTimestamp !== null);
+
+            // 3. Build the display description text list
+            let listText = "✨ **Current Supporters:**\n";
+
+            if (boosters.size === 0) {
+                listText += "ℹ️ *There are no active boosters on the server right now.*";
+            } else {
+                // Map out every booster into a mention string (e.g. • @User)
+                listText += boosters.map(member => `• <@${member.user.id}>`).join("\n");
+            }
+
+            // 4. Send the beautiful, live booster embed
+            const embed = new EmbedBuilder()
+                .setColor("#F47FFF") // Pink Discord booster color
+                .setTitle("💎 Active Server Boosters")
+                .setDescription(`Thank you to everyone supporting our community!\n\n${listText}`)
+                .setFooter({ text: `Total Active Boosters: ${boosters.size}` })
+                .setTimestamp();
+
+            return message.reply({ embeds: [embed] });
+        }
     }
 };
