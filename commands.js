@@ -332,7 +332,7 @@ module.exports = {    commandsList: {
                 return message.reply({ 
                     content: "Error: This command directory is strictly restricted to active server boosters.", 
                     ephemeral: true 
-                });
+                })
             }
 
             const menuText = 
