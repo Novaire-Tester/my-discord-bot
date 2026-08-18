@@ -80,11 +80,11 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setColor("#F47FFF")
-                .setTitle("■ ────────── Booster Commands ────────── ■")
+                .setTitle("❀──»──✧ Booster Commands ✧──«──❀")
                 .setDescription(
                     "Available rewards commands and custom parameters for server supporters:\n\n" +
-                    "**:claim-daily** || Claim your active 24-hour booster economy payout.\n" +
-                    "**:booster-perks** || View an index of custom roles and perks available to your tier."
+                    "**:claim-daily** | Claim your active 24-hour booster economy payout.\n" +
+                    "**:booster-perks** | View an index of custom roles and perks available to your tier."
                 );
 
             return message.reply({ embeds: [embed], ephemeral: true });
