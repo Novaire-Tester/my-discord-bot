@@ -52,37 +52,63 @@ client.on('interactionCreate', async (interaction) => {
     try {
         if (!interaction.isButton()) return;
 
-        // Secure security check: Only allow staff to use the dashboard buttons
+        // Security authorization check
         const hasStaffRole = interaction.member.roles.cache.some(role => config.STAFF_ROLES.includes(role.id));
         if (!hasStaffRole) {
-            return interaction.reply({ 
-                content: "❌ You do not have permission to manage booster rewards.", 
-                ephemeral: true 
-            });
+            return interaction.reply({ content: "❌ Restricted access area.", ephemeral: true });
         }
 
-        // Logic for Prize 1 Button
-        if (interaction.customId === 'edit_prize_1') {
+        // 1. Root Level: Clicked Dashboard Button
+        if (interaction.customId === 'open_dashboard') {
             const embed = new EmbedBuilder()
-                .setColor('#2ECC71')
-                .setTitle('🎁 Prize 1 Customization Menu')
-                .setDescription('You clicked to customize **Prize 1**. Options to change cash amounts or role requirements will go here next.');
+                .setColor('#3498DB')
+                .setTitle('🎛️ Reward Options Menu')
+                .setDescription("Configure how your booster rewards are claimed. Choose single selection or activate multiple prize pools.");
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('toggle_multiple').setLabel('🔀 Mode: Multiple').setStyle(ButtonStyle.Success)
+            );
+
+            // Responds privately to the staff member inside the thread
+            await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }
 
-        // Logic for Prize 2 Button
-        if (interaction.customId === 'edit_prize_2') {
-            const embed = new EmbedBuilder()
-                .setColor('#9B59B6')
-                .setTitle('✨ Prize 2 Customization Menu')
-                .setDescription('You clicked to customize **Prize 2**. System layers for adjusting secondary reward values will go here next.');
+        // 2. Root Level: Clicked Preview Button
+        if (interaction.customId === 'open_preview') {
+            await interaction.reply({ content: "🚧 The **Preview** function is locked for development and will be wired up later!", ephemeral: true });
+        }
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+        // 3. Sub Level: Toggling Multiple Mode
+        if (interaction.customId === 'toggle_multiple') {
+            const embed = new EmbedBuilder()
+                .setColor('#E67E22')
+                .setTitle('🎛️ Reward Options Menu (Multi-Select)')
+                .setDescription("🌟 **Multi-Select Active:** Staff can now select and stack multiple booster rewards simultaneously.");
+
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('toggle_singular').setLabel('🔄 Mode: Singular').setStyle(ButtonStyle.Primary)
+            );
+
+            // Replaces the existing message layout directly without creating new text bubbles
+            await interaction.update({ embeds: [embed], components: [row] });
+        }
+
+        // 4. Sub Level: Toggling back to Singular Mode
+        if (interaction.customId === 'toggle_singular') {
+            const embed = new EmbedBuilder()
+                .setColor('#3498DB')
+                .setTitle('🎛️ Reward Options Menu')
+                .setDescription("Configure how your booster rewards are claimed. Choose single selection or activate multiple prize pools.");
+
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('toggle_multiple').setLabel('🔀 Mode: Multiple').setStyle(ButtonStyle.Success)
+            );
+
+            await interaction.update({ embeds: [embed], components: [row] });
         }
 
     } catch (err) {
-        console.error("⚠️ Interaction Error caught safely:", err);
+        console.error("⚠️ Interaction system error:", err);
     }
 });
 
