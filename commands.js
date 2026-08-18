@@ -54,7 +54,6 @@ module.exports = {
                     "Secure utility list restricted to authorized management roles:\n\n" +
                     "**:staff-commands** (sc) | Displays this directory.\n" +
                     "**:influencer** (inf) @user | Toggles the Influencer profile role.\n" +
-                    
                     "**:booster-rewards** (br) | Opens interactive prize control panels.\n" +
                     "**:moderation** (mod) | Reviews advanced staff logging options.\n" +
                     "**:mute** @user (time) (why) | Applies mute server role restrictions.\n" +
