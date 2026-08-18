@@ -58,23 +58,25 @@ module.exports = {
             return message.reply({ embeds: [embed] });
         }
     },
-    boosterRewards: {
-        name: "booster-rewards",
-        shortcuts: ["br", "rewards"],
-        staffOnly: true,
-        execute: async (message, config, { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle }) => {
-            const embed = new EmbedBuilder()
-                .setColor(config.EMBED_COLOR)
-                .setTitle("🛠️ Booster Rewards Controller")
-                .setDescription("Select a control layer interface below to modify live server tier payouts.");
+// Inside commands.js - Replace your boosterRewards section with this:
+boosterRewards: {
+    name: "booster-rewards",
+    shortcuts: ["br", "rewards"],
+    staffOnly: true,
+    execute: async (message, config, { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle }) => {
+        const embed = new EmbedBuilder()
+            .setColor(config.EMBED_COLOR)
+            .setTitle("🎮 Booster Rewards Hub")
+            .setDescription("Welcome to the configuration area. Select an interface option below.");
 
-            const row = new ActionRowBuilder().addComponents(
-                new ButtonBuilder().setCustomId('edit_prize_1').setLabel('🎁 Edit Prize 1').setStyle(ButtonStyle.Primary),
-                new ButtonBuilder().setCustomId('edit_prize_2').setLabel('✨ Edit Prize 2').setStyle(ButtonStyle.Secondary)
-            );
-            return message.reply({ embeds: [embed], components: [row] });
-        }
-    },
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId('open_dashboard').setLabel('🎛️ Dashboard').setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId('open_preview').setLabel('👁️ Preview (Coming Soon)').setStyle(ButtonStyle.Secondary)
+        );
+
+        return message.reply({ embeds: [embed], components: [row] });
+    }
+},
     moderation: {
         name: "moderation",
         shortcuts: ["mod", "m"],
