@@ -320,9 +320,8 @@ module.exports = {    commandsList: {
 
             return message.reply({ embeds: [embed] });
         }
-    }
 },    
-    boosterCommandsList: {
+   boosterCommandsList: {
         name: "booster-commands",
         shortcuts: ["bc"],
         staffOnly: false,
