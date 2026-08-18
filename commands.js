@@ -71,7 +71,7 @@ boosterRewards: {
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId('open_dashboard').setLabel('🎛️ Dashboard').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('open_preview').setLabel('👁️ Preview (Coming Soon)').setStyle(ButtonStyle.Secondary)
+            new ButtonBuilder().setCustomId('open_preview').setLabel('👁️ Preview').setStyle(ButtonStyle.Secondary)
         );
 
         return message.reply({ embeds: [embed], components: [row] });
