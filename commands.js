@@ -22,8 +22,7 @@ function addOffense(userId, type, details) {
     saveHistory(history);
 }
 
-module.exports = {
-    commandsList: {
+module.exports = {    commandsList: {
         name: "commands",
         shortcuts: ["cmds", "c"],
         staffOnly: false,
@@ -31,11 +30,36 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(config.EMBED_COLOR)
                 .setTitle("📜 Public Commands List")
-                .setDescription("Standard options accessible by everyone.")
+                .setDescription("Standard operational utilities accessible by everyone.")
                 .addFields(
-                    { name: ":commands (cmds, c)", value: "Displays this public interface guide." },
-                    { name: ":help (h)", value: "Displays a short overview of bot features." },
-                    { name: ":values (v)", value: "Clarifies balance currency management authorities." }
+                    { name: "Prefix", value: `\`${config.PREFIX}\``, inline: true },
+                    { name: "▫ :commands (cmds, c)", value: "Displays this main public index dashboard." },
+                    { name: "▫ :help (h)", value: "Displays a short overview of bot features." },
+                    { name: "▫ :values (v)", value: "Clarifies balance currency management authorities." },
+                    { name: "▫ :server-boosters (boosters, sb)", value: "🔍 **NEW:** Scans the server live to display all active boosters!" }
+                );
+            return message.reply({ embeds: [embed] });
+        }
+    },
+        staffCommandsList: {
+        name: "staff-commands",
+        shortcuts: ["sc", "scommands"],
+        staffOnly: true,
+        execute: async (message, config, { EmbedBuilder }) => {
+            const embed = new EmbedBuilder()
+                .setColor("#ED4245") // Red alert color for staff eyes only
+                .setTitle("🛡️ Internal Staff Commands")
+                .setDescription("Secure dashboard utility list restricted to authorized management roles.")
+                .addFields(
+                    { name: "▫ :staff-commands (sc)", value: "Displays this hidden staff directory." },
+                    { name: "▫ :booster-rewards (br)", value: "Opens interactive prize control panels with multi-select buttons." },
+                    { name: "▫ :moderation (mod)", value: "Reviews advanced staff logging options." },
+                    { name: "▫ :mute @user (time) (why)", value: "🔇 Applies the configured mute server role restrictions." },
+                    { name: "▫ :unmute @user", value: "🔊 Clears the active mute restriction layer instantly." },
+                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "🔨 Executes administrative user ban infrastructure records." },
+                    { name: "▫ :unban ID", value: "🔓 Removes explicit target block restrictions using their user ID." },
+                    { name: "▫ :warn @user (why)", value: "⚠️ Logs a formal rule infraction warning directly to history files." },
+                    { name: "▫ :offenses @user (history, logs)", value: "🗃️ Reviews comprehensive logged infraction history files for a user." }
                 );
             return message.reply({ embeds: [embed] });
         }
@@ -46,19 +70,19 @@ module.exports = {
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
-                .setColor("#ED4245")
+                .setColor("#ED4245") // Red alert color for staff eyes only
                 .setTitle("🛡️ Internal Staff Commands")
-                .setDescription("Secure dashboard utility list restricted to management profiles.")
+                .setDescription("Secure dashboard utility list restricted to authorized management roles.")
                 .addFields(
-                    { name: ":staff-commands (sc)", value: "Displays this directory." },
-                    { name: ":booster-rewards (br)", value: "Opens interactive prize control panels." },
-                    { name: ":moderation (mod)", value: "Reviews advanced staff logging options." },
-                    { name: ":mute @user (time) (reason)", value: "Applies the mute server role restrictions." },
-                    { name: ":unmute @user", value: "Clears the active restriction layer." },
-                    { name: ":ban @user (temp/perm) (time) (reason)", value: "Executes administrative user bans." },
-                    { name: ":unban ID", value: "Removes explicit target block restrictions." },
-                    { name: ":warn @user (reason)", value: "Logs formal rule infraction warnings." },
-                    { name: ":offenses @user", value: "Reviews comprehensive logged history records." }
+                    { name: "▫ :staff-commands (sc)", value: "Displays this hidden staff directory." },
+                    { name: "▫ :booster-rewards (br)", value: "Opens interactive prize control panels with multi-select buttons." },
+                    { name: "▫ :moderation (mod)", value: "Reviews advanced staff logging options." },
+                    { name: "▫ :mute @user (time) (why)", value: "🔇 Applies the configured mute server role restrictions." },
+                    { name: "▫ :unmute @user", value: "🔊 Clears the active mute restriction layer instantly." },
+                    { name: "▫ :ban @user (temp/perm) (time) (why)", value: "🔨 Executes administrative user ban infrastructure records." },
+                    { name: "▫ :unban ID", value: "🔓 Removes explicit target block restrictions using their user ID." },
+                    { name: "▫ :warn @user (why)", value: "⚠️ Logs a formal rule infraction warning directly to history files." },
+                    { name: "▫ :offenses @user (history, logs)", value: "🗃️ Reviews comprehensive logged infraction history files for a user." }
                 );
             return message.reply({ embeds: [embed] });
         }
