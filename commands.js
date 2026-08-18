@@ -53,6 +53,8 @@ module.exports = {
                 .setDescription(
                     "Secure utility list restricted to authorized management roles:\n\n" +
                     "**:staff-commands** (sc) | Displays this directory.\n" +
+                    "**:influencer** (inf) @user | Toggles the Influencer profile role.\n" +
+                    
                     "**:booster-rewards** (br) | Opens interactive prize control panels.\n" +
                     "**:moderation** (mod) | Reviews advanced staff logging options.\n" +
                     "**:mute** @user (time) (why) | Applies mute server role restrictions.\n" +
@@ -241,6 +243,29 @@ module.exports = {
                     : userLogs.map((log, idx) => `[#${idx + 1}] [${log.type}] - ${log.details} (Logged: ${log.timestamp})`).join('\n\n'));
 
             return message.reply({ embeds: [embed] });
+        }
+    },
+        influencerRoleToggle: {
+        name: "influencer",
+        shortcuts: ["inf"],
+        staffOnly: true,
+        execute: async (message) => {
+            const target = message.mentions.members.first();
+            if (!target) return message.reply("Error: Missing execution target parameter. Format: :influencer @player");
+
+            const roleId = "1538341462125842432";
+
+            try {
+                if (!target.roles.cache.has(roleId)) {
+                    await target.roles.add(roleId);
+                    return message.reply(`<@${target.id}> has been granted the **Influencer** role successfully`);
+                } else {
+                    await target.roles.remove(roleId);
+                    return message.reply(`<@${target.id}> has had the **Influencer** role removed successfully`);
+                }
+            } catch (e) {
+                return message.reply("Error: Bot hierarchy level insufficient to modify the requested profile layer.");
+            }
         }
     },
     serverBoosters: {
