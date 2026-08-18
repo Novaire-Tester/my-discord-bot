@@ -49,7 +49,7 @@ module.exports = {
         execute: async (message, config, { EmbedBuilder }) => {
             const embed = new EmbedBuilder()
                 .setColor("#ED4245")
-                .setTitle("❀───»───✧ Staff Commands ✧───«───❀")
+                .setTitle("❀──~»──-✧ Staff Commands ✧-──«~──❀")
                 .setDescription(
                     "Secure utility list restricted to authorized management roles:\n\n" +
                     "**:staff-commands** (sc) | Displays this directory.\n" +
