@@ -205,11 +205,64 @@ module.exports = {
             }
         }
     },
-    unban: {
+        unban: {
         name: "unban",
         shortcuts: ["ub"],
         staffOnly: true,
         execute: async (message, config, { EmbedBuilder }) => {
             const args = message.content.split(/ +/).slice(1);
             const targetId = args[0];
-                        
+            if (!targetId) return message.reply("❌ Parameter tracking failed: Provide target numeric ID profile string. Format: `:unban 1234567890`");
+
+            try {
+                await message.guild.members.unban(targetId);
+                const embed = new EmbedBuilder()
+                    .setColor("#2ECC71")
+                    .setDescription(`✅ User Profile ID \`${targetId}\` unbanned successfully.`);
+                return message.reply({ embeds: [embed] });
+            } catch (e) {
+                return message.reply("❌ Directory Tracking Alert: ID element target is not currently banned.");
+            }
+        }
+    },
+    warn: {
+        name: "warn",
+        shortcuts: ["w"],
+        staffOnly: true,
+        execute: async (message, config, { EmbedBuilder }) => {
+            const target = message.mentions.members.first();
+            if (!target) return message.reply("❌ Error: Format parameters missing. Format: `:warn @player (reason)`");
+
+            const reason = message.content.split(/ +/).slice(2).join(" ") || "No reason provided.";
+            addOffense(target.id, "WARN", `Reason: ${reason} | By: ${message.author.tag}`);
+
+            const embed = new EmbedBuilder()
+                .setColor("#F1C40F")
+                .setTitle("⚠️ Formal Warning Issued")
+                .setDescription(`<@${target.id}> has received an official account warning update.`)
+                .addFields({ name: "📝 Logged Reason", value: reason });
+            return message.reply({ embeds: [embed] });
+        }
+    },
+    offenses: {
+        name: "offenses",
+        shortcuts: ["history", "logs"],
+        staffOnly: true,
+        execute: async (message, config, { EmbedBuilder }) => {
+            const userTarget = message.mentions.users.first();
+            if (!userTarget) return message.reply("❌ Parameter verification missing. Format: `:offenses @player`");
+
+            const history = getHistory();
+            const userLogs = history[userTarget.id] || [];
+
+            const embed = new EmbedBuilder()
+                .setColor(config.EMBED_COLOR)
+                .setTitle(`🗃️ Infraction Records for ${userTarget.username}`)
+                .setDescription(userLogs.length === 0 
+                    ? "✨ Clean Record. No logged infractions found inside history parameters." 
+                    : userLogs.map((log, idx) => `\`[#${idx + 1}]\` **[${log.type}]** - ${log.details} *(Logged: ${log.timestamp})*`).join('\n\n'));
+
+            return message.reply({ embeds: [embed] });
+        }
+    }
+};
