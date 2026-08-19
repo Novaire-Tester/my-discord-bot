@@ -21,7 +21,7 @@ function addOffense(userId, type, details) {
     });
     saveHistory(history);
 }
-
+ 
 module.exports = {
     commandsList: {
         name: "commands",
