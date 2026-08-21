@@ -39,6 +39,7 @@ module.exports = {
                     "**:server-boosters** (boosters, sb) | Scans live server to display active boosters.\n" +
                     "**:booster-commands** (bc) | Displays hidden booster reward directories."
                 );
+            
             return message.reply({ embeds: [embed] });
         }
     },
@@ -61,9 +62,11 @@ module.exports = {
                     "**:ban** @user (temp/perm) (time) (why) | Executes user ban records.\n" +
                     "**:unban** ID | Removes block restrictions using user ID.\n" +
                     "**:warn** @user (why) | Logs formal rule infraction warnings.\n" +
-                    "**:offenses** @user | Reviews comprehensive logged history records."
+                    "**:offenses** @user | Reviews comprehensive logged history records.\n"
                 );
+            
             return message.reply({ embeds: [embed] });
+            
         }
     },
         boosterCommandsList: {
